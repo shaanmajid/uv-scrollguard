@@ -216,7 +216,7 @@ wheels = [
 
 [[package]]
 name = "uv-scrollguard"
-version = "0.1.0rc1"
+version = "0.1.0"
 source = { editable = "." }
 
 [package.dev-dependencies]
