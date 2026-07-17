@@ -4,7 +4,7 @@ build-backend = "uv_build"
 
 [project]
 name = "uv-scrollguard"
-version = "0.1.0-rc1"
+version = "0.1.0rc1"
 description = "Require current uv lockfiles for PEP 723 scripts"
 readme = "README.md"
 requires-python = ">=3.10"

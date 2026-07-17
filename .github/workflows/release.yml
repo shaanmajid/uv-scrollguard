@@ -27,8 +27,7 @@ jobs:
         env:
           RELEASE_TAG: ${{ github.ref_name }}
         run: |
-          project_version=$(sed -n 's/^version = "\(.*\)"$/\1/p' pyproject.toml)
-          test "$RELEASE_TAG" = "v$project_version"
+          test "$RELEASE_TAG" = "v$(uv version --short)"
           uv lock --check
       - name: Build distributions
         run: uv build --no-sources
