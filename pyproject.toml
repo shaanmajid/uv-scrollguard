@@ -34,7 +34,7 @@ uv-scrollguard = "uv_scrollguard.cli:main"
 dev = [
     "prek>=0.4.8",
     "pytest>=9.1.1",
-    "ruff>=0.15.20",
+    "ruff>=0.15.21",
     "ty>=0.0.58",
 ]
 
