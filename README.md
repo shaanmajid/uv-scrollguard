@@ -12,9 +12,8 @@ catch missing, stale, and invalid script locks in CI. CI is pinned to uv 0.11.28
 The project delegates lock validation to `uv lock --script ... --check` and may
 be archived if uv provides an equivalent repository-wide check natively.
 
-> **Disclaimer:** This project was largely vibecoded and built mainly for
-> personal use. I've done my own due diligence for my security and concerns and
-> believe it is safe, but readers should use their own judgment.
+> **Disclaimer:** This project was built by AI coding agents under human
+> supervision, for personal use. Use your own judgment before relying on it.
 
 ## Policy
 
