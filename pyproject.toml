@@ -1,0 +1,43 @@
+[build-system]
+requires = ["uv_build>=0.11.0,<0.12"]
+build-backend = "uv_build"
+
+[project]
+name = "uv-scrollguard"
+version = "0.1.0-rc1"
+description = "Require current uv lockfiles for PEP 723 scripts"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Shaan Majid", email = "dev@majid.email" },
+]
+keywords = ["lockfile", "pep-723", "pre-commit", "uv"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Quality Assurance",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/shaanmajid/uv-scrollguard"
+Repository = "https://github.com/shaanmajid/uv-scrollguard"
+Issues = "https://github.com/shaanmajid/uv-scrollguard/issues"
+
+[project.scripts]
+uv-scrollguard = "uv_scrollguard.cli:main"
+
+[dependency-groups]
+dev = [
+    "prek>=0.4.8",
+    "pytest>=9.1.1",
+    "ruff>=0.15.20",
+    "ty>=0.0.56",
+]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "SIM", "C4", "PIE", "PERF", "RUF"]
+ignore = ["E501"]

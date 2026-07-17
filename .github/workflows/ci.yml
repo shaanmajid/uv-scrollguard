@@ -1,0 +1,133 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.28"
+      - name: Check lockfile
+        run: uv lock --check
+      - name: Run lint
+        run: uv run --locked ruff check .
+      - name: Check formatting
+        run: uv run --locked ruff format --check .
+
+  typecheck:
+    name: Type check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.28"
+      - name: Run type checks
+        run: uv run --locked ty check
+
+  test:
+    name: Tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.28"
+      - name: Run tests
+        run: uv run --python 3.10 --locked pytest
+
+  action:
+    name: Action
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.28"
+      - name: Create passing Action fixture
+        run: |
+          mkdir -p .tmp
+          uv init --script .tmp/pass.py
+          uv lock --script .tmp/pass.py
+      - name: Check passing fixture with local Action
+        uses: ./
+        with:
+          paths: .tmp/pass.py
+      - name: Create failing Action fixture
+        run: uv init --script .tmp/fail.py
+      - name: Check failing fixture with local Action
+        id: missing-lock
+        continue-on-error: true
+        uses: ./
+        with:
+          paths: .tmp/fail.py
+      - name: Assert missing lock failed
+        if: always()
+        env:
+          MISSING_LOCK_OUTCOME: ${{ steps.missing-lock.outcome }}
+        run: |
+          if [ "$MISSING_LOCK_OUTCOME" != "failure" ]; then
+            echo "Action unexpectedly passed for a script without a sidecar lockfile"
+            exit 1
+          fi
+      - name: Allow missing lock in existing-only mode
+        uses: ./
+        with:
+          existing-only: "true"
+          paths: .tmp/fail.py
+
+  hooks:
+    name: Hooks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+      - name: Install uv
+        uses: astral-sh/setup-uv@11f9893b081a58869d3b5fccaea48c9e9e46f990 # v8.3.2
+        with:
+          version: "0.11.28"
+      - name: Run prek hooks
+        uses: j178/prek-action@e98a699c41eb69ab013a45817a0406469a748f8d # v2.0.5
+        with:
+          prek-version: "0.4.8"
+      - name: Validate hook manifest
+        run: uv run --locked prek validate-manifest .pre-commit-hooks.yaml
+      - name: Test published hook
+        run: uv run --locked prek try-repo "$PWD" uv-scrollguard --all-files

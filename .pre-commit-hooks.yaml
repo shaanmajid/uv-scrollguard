@@ -1,0 +1,7 @@
+- id: uv-scrollguard
+  name: Check uv script lockfiles
+  description: Require current uv lockfiles for PEP 723 scripts
+  entry: uv-scrollguard
+  language: python
+  pass_filenames: false
+  always_run: true
